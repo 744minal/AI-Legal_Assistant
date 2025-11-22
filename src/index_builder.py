@@ -1,7 +1,4 @@
-"""
-Indexer: Load CSV data, create embeddings, build FAISS index
-Run this once to create the vector database
-"""
+
 import pandas as pd
 import numpy as np
 import faiss
@@ -10,10 +7,8 @@ import os
 
 from sentence_transformers import SentenceTransformer
 
-# Get the root directory (parent of src/)
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Paths - Updated to match YOUR folder structure
 DATA_PATH = os.path.join(ROOT_DIR, "dataset", "indian_legal_dataset.csv")
 VECTOR_DB_DIR = os.path.join(ROOT_DIR, "vector_db")
 INDEX_PATH = os.path.join(VECTOR_DB_DIR, "faiss.index")
@@ -33,14 +28,14 @@ def load_data():
     return df
 
 def create_embeddings(df, model_name="all-MiniLM-L6-v2"):
-    """Create embeddings using sentence-transformers"""
+   
     print(f"\n🔄 Loading embedding model: {model_name}")
     model = SentenceTransformer(model_name)
     
     print("📝 Preparing text for embedding...")
     texts = []
     for _, row in df.iterrows():
-        # Combine key fields for richer retrieval
+        
         parts = []
         if pd.notna(row.get('summary', '')):
             parts.append(str(row['summary']))
@@ -58,11 +53,10 @@ def create_embeddings(df, model_name="all-MiniLM-L6-v2"):
     return embeddings.astype(np.float32)
 
 def build_faiss_index(embeddings):
-    """Build FAISS index for fast similarity search"""
+   
     print("\n🔨 Building FAISS index...")
     dimension = embeddings.shape[1]
     
-    # Using IndexFlatIP for cosine similarity (normalized embeddings)
     index = faiss.IndexFlatIP(dimension)
     index.add(embeddings)
     
@@ -70,41 +64,38 @@ def build_faiss_index(embeddings):
     return index
 
 def save_all(index, embeddings, df):
-    """Save FAISS index, embeddings, and metadata"""
-    # Create vector_db directory in ROOT
+    
     os.makedirs(VECTOR_DB_DIR, exist_ok=True)
     print(f"\n💾 Saving to: {VECTOR_DB_DIR}")
     
-    # Save FAISS index
     faiss.write_index(index, INDEX_PATH)
     print(f"   ✅ Saved FAISS index: {INDEX_PATH}")
     
-    # Save embeddings separately (backup)
     np.save(EMBEDDINGS_PATH, embeddings)
     print(f"   ✅ Saved embeddings: {EMBEDDINGS_PATH}")
     
-    # Save metadata (case details for retrieval)
+  
     metadata = df.to_dict('records')
     with open(METADATA_PATH, 'wb') as f:
         pickle.dump(metadata, f)
     print(f"   ✅ Saved metadata: {METADATA_PATH}")
 
 def main():
-    """Main indexing pipeline"""
+ 
     print("\n" + "="*60)
     print("🏛️  LEGAL ASSISTANT - INDEXING PIPELINE")
     print("="*60)
     
-    # Step 1: Load data
+    
     df = load_data()
     
-    # Step 2: Create embeddings
+
     embeddings = create_embeddings(df)
     
-    # Step 3: Build FAISS index
+
     index = build_faiss_index(embeddings)
     
-    # Step 4: Save everything
+   
     save_all(index, embeddings, df)
     
     print("\n" + "="*60)
