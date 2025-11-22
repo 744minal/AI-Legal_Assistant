@@ -1,18 +1,13 @@
-"""
-AI Legal Research Assistant for Indian Case Law
-Main entry point with demo queries and interactive mode
-"""
+
 import os
 import sys
 
-# Add project root to path
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT_DIR)
 
 from src.case_retriever import LegalRetriever, format_retrieved_cases
 from src.response_generator import LegalGenerator
 
-# Demo queries covering different legal areas
 DEMO_QUERIES = [
     {
         "query": "A tenant in Mumbai has been living in an apartment for 10 years. The landlord wants to evict without proper notice. What are the tenant's rights?",
@@ -45,28 +40,23 @@ class LegalAssistant:
         print(f"📌 YOUR QUERY:\n{query}")
         print("-"*60)
         
-        # Step 1 & 2: Query Understanding + Retrieval
         print(f"\n🔍 CASES RETRIEVED: {top_k}")
         retrieval_result = self.retriever.retrieve(query, top_k)
         
-        # Show query analysis
         qa = retrieval_result['query_analysis']
         print(f"   Detected Legal Areas: {', '.join(qa['detected_legal_areas'])}")
         
-        # Show retrieval stats
         stats = retrieval_result['retrieval_stats']
         print(f"   Top Match Confidence: {stats['top_confidence']}%")
         print(f"   Average Confidence: {stats['avg_confidence']}%")
         
-        # Step 3: Generate Response
         print("\n" + "-"*60)
         print("📝 GENERATING ANALYSIS...")
         print("-"*60 + "\n")
         
         response = self.generator.generate(query, retrieval_result)
         print(response)
-        
-        # Show retrieved case details
+ 
         print("\n" + "-"*60)
         print("📚 RETRIEVED CASES DETAIL:")
         print("-"*60)
@@ -75,7 +65,7 @@ class LegalAssistant:
         return response, retrieval_result
 
 def run_demo(assistant):
-    """Run demo queries"""
+   
     print("\n" + "="*60)
     print("🎯 RUNNING DEMO QUERIES (3 Demos)")
     print("="*60)
@@ -91,7 +81,7 @@ def run_demo(assistant):
             input("\n⏎ Press Enter for next demo...")
 
 def interactive_mode(assistant):
-    """Interactive query mode"""
+  
     print("\n" + "="*60)
     print("💬 INTERACTIVE MODE")
     print("   Type your legal query or 'quit' to exit")
@@ -112,7 +102,6 @@ def interactive_mode(assistant):
         assistant.process_query(query)
 
 def main():
-    """Main function"""
     
     print("AI LEGAL RESEARCH ASSISTANT FOR INDIAN CASE LAW")
     
@@ -127,8 +116,7 @@ def main():
     if choice == '3':
         print("Goodbye!")
         return
-    
-    # Initialize assistant
+ 
     assistant = LegalAssistant()
     
     if choice == '1':
@@ -144,4 +132,5 @@ def main():
     print("="*60 + "\n")
 
 if __name__ == "__main__":
+
     main()
