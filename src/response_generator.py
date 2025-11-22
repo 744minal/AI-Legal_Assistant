@@ -120,11 +120,6 @@ The retrieved cases don't appear directly relevant to your question.
 **Retrieval Stats:**
 - Top Match Confidence: {stats['top_confidence']}% (below threshold)
 
-**Recommendations:**
-1. Rephrase with more specific legal terms
-2. Break down into smaller, focused queries
-3. Consult a legal professional
-
 **Note:** This assistant covers 175 Indian court cases. Your scenario may need cases not in our database.
 """
 
