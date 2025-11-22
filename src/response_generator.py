@@ -1,18 +1,14 @@
-"""
-Generator: Use Groq LLM to synthesize legal analysis from retrieved cases
-Strictly grounded - only cites retrieved cases, no hallucination
-"""
+
 import os
 from groq import Groq
 from dotenv import load_dotenv
 
-# Load .env from root directory
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(ROOT_DIR, ".env"))
 
 class LegalGenerator:
     def __init__(self):
-        """Initialize Groq client"""
+        
         api_key = os.getenv("GROQ_API_KEY")
         if not api_key:
             raise ValueError(
@@ -25,7 +21,7 @@ class LegalGenerator:
         print(f"✅ Generator initialized with {self.model}")
     
     def _build_context(self, cases):
-        """Build context string from retrieved cases"""
+       
         context_parts = []
         for case in cases:
             full_text = str(case.get('full_text', ''))[:800]
@@ -88,7 +84,7 @@ Respond in this format:
         cases = retrieval_result['cases']
         stats = retrieval_result['retrieval_stats']
         
-        # Handle no relevant cases
+       
         if not cases or stats['top_confidence'] < 20:
             return self._no_cases_response(query, stats)
         
