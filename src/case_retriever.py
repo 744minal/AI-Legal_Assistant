@@ -1,17 +1,12 @@
-"""
-Retriever: Search FAISS index for relevant cases
-Includes query understanding and confidence scoring
-"""
+
 import faiss
 import pickle
 import numpy as np
 import os
 from sentence_transformers import SentenceTransformer
 
-# Get the root directory (parent of src/)
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Paths - matching your folder structure
 VECTOR_DB_DIR = os.path.join(ROOT_DIR, "vector_db")
 INDEX_PATH = os.path.join(VECTOR_DB_DIR, "faiss.index")
 METADATA_PATH = os.path.join(VECTOR_DB_DIR, "metadata.pkl")
@@ -21,7 +16,6 @@ class LegalRetriever:
         """Initialize retriever with FAISS index and embedding model"""
         print("🔄 Loading retriever...")
         
-        # Check if index exists
         if not os.path.exists(INDEX_PATH):
             raise FileNotFoundError(
                 f"❌ FAISS index not found at {INDEX_PATH}\n"
@@ -61,14 +55,11 @@ class LegalRetriever:
         }
     
     def search(self, query, top_k=5):
-        """Step 2: Retrieval - Search for relevant cases with confidence scores"""
-        # Embed the query
+      
         query_embedding = self.model.encode([query], normalize_embeddings=True)
         
-        # Search FAISS index
         scores, indices = self.index.search(query_embedding.astype(np.float32), top_k)
         
-        # Prepare results with confidence
         results = []
         for i, (score, idx) in enumerate(zip(scores[0], indices[0])):
             if idx < 0 or idx >= len(self.metadata):
@@ -76,11 +67,10 @@ class LegalRetriever:
                 
             case = self.metadata[idx].copy()
             
-            # Confidence scoring (cosine similarity 0-1 for normalized embeddings)
             confidence = float(max(0, min(score, 1)))  # Clamp to 0-1
             confidence_pct = round(confidence * 100, 1)
             
-            # Determine confidence level
+          
             if confidence >= 0.5:
                 conf_level = "HIGH"
             elif confidence >= 0.35:
@@ -99,13 +89,12 @@ class LegalRetriever:
     
     def retrieve(self, query, top_k=5):
         """Full retrieval pipeline with query understanding"""
-        # Step 1: Understand query
+
         query_info = self.understand_query(query)
         
-        # Step 2: Search
         results = self.search(query, top_k)
         
-        # Calculate overall retrieval confidence
+      
         if results:
             avg_conf = np.mean([r['similarity_score'] for r in results])
             max_conf = results[0]['similarity_score']
@@ -139,7 +128,7 @@ def format_retrieved_cases(retrieval_result):
         output.append(formatted)
     return "\n".join(output)
 
-# Test
+
 if __name__ == "__main__":
     retriever = LegalRetriever()
     test_query = "tenant eviction without notice"
